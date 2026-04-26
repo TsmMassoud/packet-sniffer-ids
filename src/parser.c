@@ -3,7 +3,6 @@
 #include <pcap/pcap.h>
 #include <arpa/inet.h> // For conversion like inet_ntoa
 #include <stdio.h>
-#include <pcap/pcap.h>
 
 void parse_packet(const u_char *packet,const struct pcap_pkthdr *header){
 
@@ -13,9 +12,11 @@ void parse_packet(const u_char *packet,const struct pcap_pkthdr *header){
 
 
     // Extract IP_src and IP_dest
-    char *ip_src,*ip_dest;
-    ip_src = inet_ntoa(ip_header->ip_src);
-    ip_dest = inet_ntoa(ip_header->ip_dst);
+    char ip_src[INET_ADDRSTRLEN];
+    char ip_dest[INET_ADDRSTRLEN];
+
+    strcpy(ip_src, inet_ntoa(ip_header->ip_src));
+    strcpy(ip_dest, inet_ntoa(ip_header->ip_dst));
 
 
     // Print Ip addr
