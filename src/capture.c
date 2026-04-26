@@ -1,44 +1,31 @@
 #include <stdio.h>
 #include <pcap/pcap.h>
 
-/* Callback function which sends snaps to parser lately */
-
+// Callback executed for each captured packet
 void callback_analyse(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
-    printf("Packet received. Length : %u\n",(unsigned int)header->len);
+    printf("Packet received. Length : %u\n", (unsigned int)header->len);
 }
 
-
-/* Function : capture snap and call a callback function for every snap received */
+// Start packet capture and process packets via callback
 void start_capture(){
-    
-    /******************************/
-    /******* INITIALISATION *******/
-    /******************************/
 
+    // --- Initialisation ---
     char *device = "eth0";
     char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_t *handle = pcap_open_live(device,65535,1,1000,errbuf);
+
+    pcap_t *handle = pcap_open_live(device, 65535, 1, 1000, errbuf);
 
     if(handle == NULL){
-        fprintf(stderr,"Error while opening device %s: %s\n",device,errbuf);
+        fprintf(stderr, "Error while opening device %s: %s\n", device, errbuf);
         return;
     }
 
-    /* -------------------------- */
+    // --- Listening ---
+    printf("Listening on interface %s...", device);
 
-    /******************************/
-    /********* LISTENING **********/
-    /******************************/
+    // Infinite capture loop
+    pcap_loop(handle, -1, callback_analyse, NULL);
 
-    printf("Listening on interface %s...",device);
-
-    /* Capture */
-    pcap_loop(handle,-1,callback_analyse,NULL);
-
-    /* -------------------------- */
-
-    /* Close pcap */
+    // Cleanup
     pcap_close(handle);
-
-
 }
